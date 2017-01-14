@@ -1,0 +1,25 @@
+{
+  "name": "buoyancy",
+  "version": "0.0.0",
+  "description": "",
+  "main": "buoyancy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "yo-yo",
+    "data-down-actions-up"
+  ],
+  "author": "ishiduca@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "global": "^4.3.1",
+    "sheet-router": "^4.2.0",
+    "yo-yo": "^1.3.2"
+  },
+  "devDependencies": {
+    "global": "^4.3.1",
+    "on-load": "^3.2.0",
+    "yo-yoify": "^3.5.0"
+  }
+}

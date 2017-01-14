@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "xtend": "^4.0.1"
+  },
+  "scripts": {
+    "build": "browserify app.js > bundle.js"
+  },
+  "browserify": {
+    "transform": [
+      "yo-yoify"
+    ]
+  }
+}
