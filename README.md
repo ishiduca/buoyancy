@@ -14,7 +14,7 @@ const buoyancy = require('buoyancy')
 const html = buoyancy.html
 
 // start
-cost root = html `<main></main>`
+const root = html `<main></main>`
 
 // notFoundView
 const notFoundView = html `
@@ -92,6 +92,8 @@ sheetRouter([
 ])
 ```
 
+#### reducer
+
 ```js
 const reducer = (type, state, action) {
   if (type === 'update') {
@@ -101,9 +103,9 @@ const reducer = (type, state, action) {
 }
 ```
 
-** `type` is sended string by dispatcher.
-** `state`
-** `action` is sended value by dispatcher.
+* `type` is sended string by dispatcher.
+* `state`
+* `action` is sended value by dispatcher.
 
 async
 
