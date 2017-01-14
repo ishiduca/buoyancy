@@ -1,6 +1,9 @@
 {
   "dependencies": {
-    "xtend": "^4.0.1"
+    "global": "^4.3.1",
+    "on-load": "^3.2.0",
+    "xtend": "^4.0.1",
+    "yo-yoify": "^3.5.0"
   },
   "scripts": {
     "build": "browserify app.js > bundle.js"
