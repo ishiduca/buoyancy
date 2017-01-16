@@ -1,4 +1,3 @@
-const d = require('global/document')
 const yo = require('yo-yo')
 
 module.exports = function buoyancy (el, state, reducer) {
@@ -19,9 +18,4 @@ module.exports = function buoyancy (el, state, reducer) {
   function noop () {}
 }
 
-module.exports.createRoot = createRoot
 module.exports.html = yo
-
-function createRoot (name) {
-  return typeof name === 'string' ? d.createElement(name) : name
-}

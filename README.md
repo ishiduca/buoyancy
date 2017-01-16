@@ -72,7 +72,7 @@ const app = buoyancy(dom, state, reducer)
 
 #### app
 
-`app` is a function. take 1 argument, `function`. return DOM.
+`app` is a function. take 1 argument, `function`. return DOM, updated.
 
 ```js
 sheetRouter([
@@ -124,12 +124,6 @@ const reducer = (type, state, action) {
   return state
 }
 ```
-
-### 
-
-### const rootDOM = buoyancy.createElement(tagName)
-
-`buoyancy.createElement` is a funciton. takes a argument `tagName`. returns DOM.
 
 ## see also
 

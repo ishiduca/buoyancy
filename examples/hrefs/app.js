@@ -6,7 +6,7 @@ const xtend = require('xtend')
 
 const buoyancy = require('../../buoyancy')
 const yo = buoyancy.html
-const root = buoyancy.createRoot('main')
+const root = yo `<main></main>`
 
 // mainHandler
 const mainModel = {
@@ -62,9 +62,9 @@ const notFoundHandler = () => yo `
 
 // routing
 const router = sheetRouter([
-  ['/404', notFoundHandler],
   ['/', mainHandler],
-  ['/:username', subHandler]
+  ['/:username', subHandler],
+  ['/404', notFoundHandler]
 ])
 
 href(h => yo.update(root, router(h.pathname)))
