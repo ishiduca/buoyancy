@@ -1,6 +1,6 @@
 {
   "name": "buoyancy",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "a helper function to create yo-yo app with sheet-router",
   "main": "buoyancy.js",
   "scripts": {
@@ -13,7 +13,6 @@
   "author": "ishiduca@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "sheet-router": "^4.2.0",
     "yo-yo": "^1.3.2"
   },
   "devDependencies": {},
