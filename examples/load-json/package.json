@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "buoyancy": "file:../..",
+    "dom-css": "^2.1.0",
+    "ecstatic": "^2.2.1",
+    "jsonist": "^2.1.0"
+  },
+  "devDependencies": {
+    "yo-yoify": "^3.7.3"
+  },
+  "scripts": {
+    "build": "browserify -t [yo-yoify] ./src/main.js -o ./static/bundle.js"
+  }
+}

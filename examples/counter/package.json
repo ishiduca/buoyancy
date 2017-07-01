@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "buoyancy": "file:../..",
+    "ecstatic": "^2.2.1"
+  },
+  "devDependencies": {
+    "yo-yoify": "^3.7.3"
+  },
+  "scripts": {
+    "build": "browserify -t [yo-yoify] ./app.js -o ./static/bundle.js"
+  }
+}
