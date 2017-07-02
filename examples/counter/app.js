@@ -3,6 +3,8 @@ var html = require('buoyancy/html')
 
 var app = buoyancy({
   count: 0
+}, {
+  history: false   
 })
 
 app.reduce({
@@ -15,7 +17,7 @@ app.reduce({
 app.use((emitter, getData) => {
   emitter.on('*', function logger (params) {
     console.log('evnet - "%s"', this.event)
-    console.dir(params)
+    console.log(params)
   })
 
   emitter.on('error', err => {

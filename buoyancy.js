@@ -6,21 +6,25 @@ var nanohref = require('nanohref')
 var Router = require('routes')
 var urlParse = require('url-parse')
 
-module.exports = function buoyancy (defaultData) {
-  var data = xtend(defaultData)
+module.exports = function buoyancy (defaultData, _opt) {
+  var opt = xtend({
+    history: true,
+    href: true,
+  }, _opt)
+
+  var enableHistory = !! opt.history
+  var enableHref = !! opt.href
+
   var emitter = em()
   var router = new Router()
+  var data = xtend(defaultData)
   var el
   var render
 
-  function help (route) {
-    var match = router.match(route)
-    if (match) match.fn.apply(null, [match.params, match])
-  }
-
   function renderer (route) {
-    if (route) help(route)
-    if (!render) help('/404')
+    if (route) mountRender(route)
+    if (!render) mountRender('/404')
+
     return (el = yo `
       <section id="buoyancy-app-root">
         ${render(xtend(data), actionsUp)}
@@ -28,22 +32,27 @@ module.exports = function buoyancy (defaultData) {
     `)
   }
 
-  emitter.on('update', function (p) {
-    data = xtend(data, p)
-    el = yo.update(el, renderer())
-  })
+  if (enableHistory) {
+    emitter.on('window.history.pushState', function (data, params, route) {
+      window.history.pushState([data, params, route], null, route)
+    })
 
-  nanohref(function (loc) {
-    var u = urlParse(loc.href, true)
-    if (window.location.href === u.href) return
-    help(u.pathname)
-    update()
-  })
+    window.onpopstate = function onpopstate (e) {
+      emitter.emit('window.onpopstate', e.state)
+//      mountRender(e.state[2])
+      var u = urlParse(document.location)
+      mountRender(u.pathname)
+      update()
+    }
 
-  window.onpopstate = function onpopstate (e) {
-    emitter.emit('window.onpopstate', e.state)
-    help(e.state[2])
-    update()
+    if (enableHref) {
+      nanohref(function (loc) {
+        var u = urlParse(loc.href, true)
+        if (window.location.href === u.href) return
+        mountRender(u.pathname)
+        update()
+      })
+    }
   }
 
   route('/404', notFound)
@@ -54,10 +63,16 @@ module.exports = function buoyancy (defaultData) {
 
   return renderer
 
+  function mountRender (route) {
+    var match = router.match(route)
+    if (match) match.fn.apply(null, [match.params, match])
+  }
+
   function route (route, handler) {
     router.addRoute(route, function (params, match) {
       render = function _render (data, actionsUp) {
-        window.history.pushState([data, params, route], null, route)
+// look
+        emitter.emit('window.history.pushState', data, params, route)
         return handler(data, params, route, actionsUp)
       }
     })
@@ -84,7 +99,9 @@ module.exports = function buoyancy (defaultData) {
   }
 
   function update (p) {
-    emitter.emit('update', p)
+    data = xtend(data, p)
+    emitter.emit('update', {partial: p, data: xtend(data)})
+    el = yo.update(el, renderer())
   }
 
   function actionsUp () {

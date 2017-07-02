@@ -1,9 +1,10 @@
 {
-  "dependencies": {
-    "buoyancy": "file:../.."
-  },
   "devDependencies": {
     "yo-yoify": "^3.7.3"
+  },
+  "dependencies": {
+    "buoyancy": "file:../..",
+    "dom-css": "^2.1.0"
   },
   "scripts": {
     "build": "browserify -t [yo-yoify] ./app.js -o ./bundle.js"
