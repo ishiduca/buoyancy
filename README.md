@@ -97,7 +97,7 @@ registers `Reducer`.
 app.reduce({
   increment: function incrementReducer (data, action, update) {
     if (typeof action !== 'number') {
-      throw new TypeError('"increment" action must be "number")
+      throw new TypeError('"increment" action must be "number"`)
     }
     var c = data.count + action
     update({count: c})
