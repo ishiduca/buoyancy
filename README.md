@@ -167,30 +167,3 @@ document.body.appendChild(app('/'))
 * [yo-yo](https://www.npmjs.com/package/yo-yo)
 * [namespace-emitter](https://www.npmjs.com/package/namespace-emitter)
 * [routes](https://www.npmjs.com/package/routes)
-* __renderFunction__ returns `HTML Element`. 
-
-```js
-app.route('/', function mainViewRender (data, params, route, actionsUp) {
-  return html `
-    <div>
-      <button onclick=${e => actionsUp('timer:start')}>timer start</button>
-      <div>${data.count}</div>
-    </div>
-  `
-})
-```
-
-### HTMLElement = app(routePath)
-
-`app` is function. returns a `HTML Element`. take an argument - `routePath`
-
-* __routePath__ `urlObject.path`
-
-```js
-document.body.appendChild(app('/'))
-```
-
-## see also
-
-* [yo-yo](https://www.npmjs.com/package/yo-yo)
-* [namespace-emitter](https://www.npmjs.com/package/namespace-emitter)
