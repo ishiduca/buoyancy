@@ -33,15 +33,10 @@ module.exports = function buoyancy (defaultData, _opt) {
   }
 
   if (enableHistory) {
-    emitter.on('window.history.pushState', function (data, params, route) {
-      window.history.pushState([data, params, route], null, route)
-    })
-
     window.onpopstate = function onpopstate (e) {
       emitter.emit('window.onpopstate', e.state)
-//      mountRender(e.state[2])
-      var u = urlParse(document.location)
-      mountRender(u.pathname)
+      var u = urlParse(window.location)
+      mountRender(u.pathname, u)
       update()
     }
 
@@ -49,7 +44,11 @@ module.exports = function buoyancy (defaultData, _opt) {
       nanohref(function (loc) {
         var u = urlParse(loc.href, true)
         if (window.location.href === u.href) return
-        mountRender(u.pathname)
+
+        var pathname = u.pathname
+        mountRender(pathname, u)
+        window.history.pushState(u, null, pathname)
+        emitter.emit('window.history.pushState', pathname)
         update()
       })
     }
@@ -63,17 +62,15 @@ module.exports = function buoyancy (defaultData, _opt) {
 
   return renderer
 
-  function mountRender (route) {
-    var match = router.match(route)
-    if (match) match.fn.apply(null, [match.params, match])
+  function mountRender (pathname, _urlObj) {
+    var match = router.match(pathname)
+    if (match) match.fn.apply(null, [match.params, match, _urlObj])
   }
 
   function route (route, handler) {
-    router.addRoute(route, function (params, match) {
+    router.addRoute(route, function (params, match, _urlObj) {
       render = function _render (data, actionsUp) {
-// look
-        emitter.emit('window.history.pushState', data, params, route)
-        return handler(data, params, route, actionsUp)
+        return handler(data, params, xtend(_urlObj, match), actionsUp)
       }
     })
   }
@@ -112,7 +109,7 @@ module.exports = function buoyancy (defaultData, _opt) {
 function notFound (data, _params, route, actionsUp) {
   return yo `<div>
     <h1>not found. :(</h1>
-    <p>url: "${route}"</p>
+    <p>url: "${route.route}"</p>
   </div>`
 }
 
