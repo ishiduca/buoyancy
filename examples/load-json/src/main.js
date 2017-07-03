@@ -9,7 +9,6 @@ var app = buoyancy({
 })
 
 app.reduce(reducer)
-
 app.use((emitter, getData) => {
   emitter.on('*', function logger (p) {
     console.log(this.event)
@@ -17,9 +16,7 @@ app.use((emitter, getData) => {
   })
   emitter.on('error', err => console.error(err))
 })
-
 app.use(setupApi)
-
 app.route('/', mainView)
 app.route('/load/:json', resultView)
 
