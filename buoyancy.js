@@ -4,7 +4,7 @@ var xtend = require('xtend')
 var em = require('namespace-emitter')
 var nanohref = require('nanohref')
 var Router = require('routes')
-var urlParse = require('url-parse')
+var url = require('url')
 
 module.exports = function buoyancy (defaultData, _opt) {
   var opt = xtend({
@@ -35,20 +35,25 @@ module.exports = function buoyancy (defaultData, _opt) {
   if (enableHistory) {
     window.onpopstate = function onpopstate (e) {
       emitter.emit('window.onpopstate', e.state)
-      var u = urlParse(window.location)
-      mountRender(u.pathname, u)
+      var u = url.parse(window.location.href, true)
+      var match = mountRender(u.pathname, u)
+      if (!match) return
+
       update()
     }
 
     if (enableHref) {
       nanohref(function (loc) {
-        var u = urlParse(loc.href, true)
+        var u = url.parse(loc.href, true)
         if (window.location.href === u.href) return
 
+        var match = mountRender(u.pathname, u)
+        if (!match) return
+
         var pathname = u.pathname
-        mountRender(pathname, u)
-        window.history.pushState(u, null, pathname)
-        emitter.emit('window.history.pushState', pathname)
+        var obj = xtend(u, {params: match.params, splats: match.splats})
+        window.history.pushState(obj, null, pathname + (u.search || ''))
+        emitter.emit('window.history.pushState', pathname, obj)
         update()
       })
     }
@@ -62,15 +67,19 @@ module.exports = function buoyancy (defaultData, _opt) {
 
   return renderer
 
-  function mountRender (pathname, _urlObj) {
+  function mountRender (pathname, urlObj) {
     var match = router.match(pathname)
-    if (match) match.fn.apply(null, [match.params, match, _urlObj])
+    if (!match) return
+
+    var params = xtend(match.params, (urlObj || {}).query)
+    match.fn.apply(null, [params, pathname])
+    return match
   }
 
   function route (route, handler) {
-    router.addRoute(route, function (params, match, _urlObj) {
+    router.addRoute(route, function (params, pathname) {
       render = function _render (data, actionsUp) {
-        return handler(data, params, xtend(_urlObj, match), actionsUp)
+        return handler(data, params, pathname, actionsUp)
       }
     })
   }
@@ -109,7 +118,7 @@ module.exports = function buoyancy (defaultData, _opt) {
 function notFound (data, _params, route, actionsUp) {
   return yo `<div>
     <h1>not found. :(</h1>
-    <p>url: "${route.route}"</p>
+    <p>url: "${route}"</p>
   </div>`
 }
 

@@ -6,7 +6,7 @@ var app = buoyancy()
 app.use(emitter => {
   emitter.on('*', function (p) {
     console.log(this.event)
-    console.log(p)
+    console.log(arguments)
   })
 })
 
