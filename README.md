@@ -2,8 +2,6 @@
 
 front-end framework. based [yo-yo](https://www.npmjs.com/package/yo-yo) and [simple observer](https://www.npmjs.com/package/namespace-emitter).
 
-# still in **v2 beta**
-
 ## features
 
 * data flows one-way. "data down, actions up".
@@ -18,7 +16,7 @@ var html = require('buoyancy/html')
 var app = buoyancy({
   count: 0
 }, {
-  history: false
+  location: false
 })
 
 app.reduce({
@@ -86,8 +84,10 @@ Components -action-> emitter -action-> (API -action"-> emitter -action"->) Reduc
 
 ### var app = buoyancy(defaultData[, opts)]
 
-* __opts.history__ default true. listens for url changes through the history API.
-* __opts.href__ default true. when clicking on <a> element, it swaps rendering function and updates data and re-renders.
+* __opts.location__ - whether to manage the `window.location`. if `window.history.pushState` is available it will use that otherwise it will use `window.location.hash.
+  * set to `false` to disable
+  * `hash` to force using hashes
+  * `history` to force using pushState.
 
 ### app.reduce({Reducers})
 
