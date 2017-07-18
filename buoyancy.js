@@ -1,94 +1,80 @@
-'use strict'
+var url = require('url')
+var w = require('global/window')
+var d = require('global/document')
 var yo = require('yo-yo')
 var xtend = require('xtend')
-var em = require('namespace-emitter')
-var nanohref = require('nanohref')
-var Router = require('routes')
-var url = require('url')
+var href = require('nanohref')
+var nsemitter = require('namespace-emitter')
+var routington = require('routington')
 
 module.exports = function buoyancy (defaultData, _opt) {
-  var opt = xtend({
-    history: true,
-    href: true,
-  }, _opt)
-
-  var enableHistory = !! opt.history
-  var enableHref = !! opt.href
-
-  var emitter = em()
-  var router = new Router()
   var data = xtend(defaultData)
+  var opt = xtend(_opt)
   var el
+  var uri
   var render
+  var emitter = nsemitter()
+  var router = routington()
 
-  function renderer (route) {
-    if (route) mountRender(route)
-    if (!render) mountRender('/404')
-
-    return (el = yo `
-      <section id="buoyancy-app-root">
-        ${render(xtend(data), actionsUp)}
-      </section>
-    `)
+  function app (route) {
+    mount(route)
+    return yo `<section id="buoyancy-app-root">${el}</section>`
   }
 
-  if (enableHistory) {
-    window.onpopstate = function onpopstate (e) {
-      emitter.emit('window.onpopstate', e.state)
-      var u = url.parse(window.location.href, true)
-      var match = mountRender(u.pathname, u)
-      if (!match) return
+  app.route = addRoute
+  app.use = register
+  app.reduce = reduce
 
-      update()
+  if (opt.location !== false) init(opt.location)
+  addRoute('/404', notFound)
+
+  return app
+
+  function mount (route) {
+    if (route) uri = route
+    if (!uri) return emitter.emit('error', new Error('mount error uri not found'))
+
+    emitter.emit('mount', uri)
+
+    var u = url.parse(uri, true)
+    var m = router.match(u.pathname)
+    if (m == null) return onNotFound()
+
+    render = m.node.model(xtend(m.param, u.query), uri)
+    el = (!el) ? r() : yo.update(el, r())
+
+    function r () {
+      return render(xtend(data), actionsUp)
     }
 
-    if (enableHref) {
-      nanohref(function (loc) {
-        var u = url.parse(loc.href, true)
-        if (window.location.href === u.href) return
+    function rr () {
+      return notFound(xtend(data), u.query, uri, actionsUp)
+    }
 
-        var match = mountRender(u.pathname, u)
-        if (!match) return
+    function onNotFound () {
+      el = (!el) ? rr() : yo.update(el, rr())
+    }
+  }
 
-        var pathname = u.pathname
-        var obj = xtend(u, {params: match.params, splats: match.splats})
-        window.history.pushState(obj, null, pathname + (u.search || ''))
-        emitter.emit('window.history.pushState', pathname, obj)
-        update()
+  function addRoute (route, model) {
+    var node = router.define(route)[0]
+    node.label = route
+    node.model = function nodeModel (params, uri) {
+      return (render = function nodeRender (data, actionsUp) {
+        return model(data, params, uri, actionsUp)
       })
     }
   }
 
-  route('/404', notFound)
-
-  renderer.use = register
-  renderer.reduce = reduce
-  renderer.route = route
-
-  return renderer
-
-  function mountRender (pathname, urlObj) {
-    var match = router.match(pathname)
-    if (!match) return
-
-    var params = xtend(match.params, (urlObj || {}).query)
-    match.fn.apply(null, [params, pathname])
-    return match
-  }
-
-  function route (route, handler) {
-    router.addRoute(route, function (params, pathname) {
-      render = function _render (data, actionsUp) {
-        return handler(data, params, pathname, actionsUp)
-      }
-    })
+  function register (f) {
+    f(emitter, getData)
   }
 
   function reduce (reducers) {
     Object.keys(reducers).forEach(function (name) {
       emitter.on(name, function (action) {
         try {
-          reducers[name](getData(), action, update)
+          reducers[name](xtend(data), action, update)
         } catch (err) {
           emitter.emit('error', err)
         }
@@ -96,30 +82,66 @@ module.exports = function buoyancy (defaultData, _opt) {
     })
   }
 
-  function register (f) {
-    f(emitter, getData)
-  }
-
-  function getData () {
-    return xtend(data)
-  }
-
   function update (p) {
+    _update(p)
+    el = yo.update(el, render(xtend(data), actionsUp))
+  }
+  function _update (p) {
+    if (!p) return
     data = xtend(data, p)
-    emitter.emit('update', {partial: p, data: xtend(data)})
-    el = yo.update(el, renderer())
+    emitter.emit('update', xtend(data), p)
   }
+  function getData () { return xtend(data) }
+  function actionsUp () { emitter.emit.apply(emitter, arguments) }
 
-  function actionsUp () {
-    emitter.emit.apply(emitter, arguments)
+  function init (which) {
+    if (!d.location) return
+
+    var preventOnMount = false
+
+    var usePush = !!(w && w.history && w.history.pushState)
+    if (which === 'history') usePush = true
+    else if (which === 'hash') usePush = false
+
+    if (usePush) {
+      w.onpopstate = function windowOnPopstate (e) {
+        preventOnMount = true
+        mount(cURL(d.location.href))
+      }
+      emitter.on('mount', function (uri) {
+        if (!preventOnMount) w.history.pushState({}, uri, uri)
+        preventOnMount = false
+      })
+    } else {
+      w.addEventListner('hashchange', function (e) {
+        preventOnMount = true
+        mount(d.location.hash.slice(1))
+      })
+      emitter.on('mount', function (uri) {
+        if (!preventOnMount) d.location.href = (uri.slice(0, 1) === '#') ? uri : '#' + uri
+        preventOnMount = false
+      })
+    }
+
+    href(function (node) {
+      mount(cURL(node.href))
+    })
+
+    function cURL (uri) {
+      var u = url.parse(uri)
+      var h = u.pathname
+      if (u.query) h += (u.query.slice(0, 1) === '?') ? u.query : '?' + u.query
+      if (u.hash) h += u.hash
+      return h
+    }
   }
 }
 
-function notFound (data, _params, route, actionsUp) {
-  return yo `<div>
-    <h1>not found. :(</h1>
-    <p>url: "${route}"</p>
-  </div>`
+function notFound (data, params, uri, actionsUp) {
+  return yo `
+    <section>
+      <h1>404 not found.</h1>
+      <p>uri - "${uri}"</p>
+    </section>
+  `
 }
-
-module.exports.notFound = notFound

@@ -136,7 +136,7 @@ app.use(function (emitter, getData) {
 
 register `render function`
 
-* __routePattern__ see [routes](https://www.npmjs.com/package/routes)
+* __routePattern__ see [routington](https://www.npmjs.com/package/routington)
 * __renderFunction__ returns `HTML Element`. takes 4 arguments - `data`, `params`, `route`, `actionsUp`.
 
 ** __actionsUp__ `function`. take 2 arguments - `type` and `value`. pass `value` to `emitter` or `Reducer`(via emitter). `type` is "event name" received `emitter.on`.
@@ -166,4 +166,4 @@ document.body.appendChild(app('/'))
 
 * [yo-yo](https://www.npmjs.com/package/yo-yo)
 * [namespace-emitter](https://www.npmjs.com/package/namespace-emitter)
-* [routes](https://www.npmjs.com/package/routes)
+* [routington](https://www.npmjs.com/package/routington)

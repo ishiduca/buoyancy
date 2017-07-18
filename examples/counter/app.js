@@ -4,7 +4,7 @@ var html = require('buoyancy/html')
 var app = buoyancy({
   count: 0
 }, {
-  history: false   
+  location: false
 })
 
 app.reduce({

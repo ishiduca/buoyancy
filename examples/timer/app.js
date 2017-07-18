@@ -12,7 +12,7 @@ var app = buoyancy({
   },
   toggleButtonDisabled: null
 }, {
-  history: false
+  location: false
 })
 
 app.reduce(reducer)
