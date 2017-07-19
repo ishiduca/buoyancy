@@ -41,11 +41,8 @@ module.exports = function buoyancy (defaultData, _opt) {
     if (m == null) return onNotFound()
 
     render = m.node.model(xtend(m.param, u.query), uri)
-    el = (!el) ? r() : yo.update(el, r())
-
-    function r () {
-      return render(xtend(data), actionsUp)
-    }
+    if (!el) el = _rend()
+    else el = _updateEl()
 
     function rr () {
       return notFound(xtend(data), u.query, uri, actionsUp)
@@ -84,13 +81,18 @@ module.exports = function buoyancy (defaultData, _opt) {
 
   function update (p) {
     _update(p)
-    el = yo.update(el, render(xtend(data), actionsUp))
+    _updateEl()
   }
+
   function _update (p) {
     if (!p) return
     data = xtend(data, p)
     emitter.emit('update', xtend(data), p)
   }
+
+  function _updateEl () { return (el = yo.update(el, _rend())) }
+  function _rend () { return render(xtend(data), actionsUp) }
+
   function getData () { return xtend(data) }
   function actionsUp () { emitter.emit.apply(emitter, arguments) }
 
@@ -113,7 +115,7 @@ module.exports = function buoyancy (defaultData, _opt) {
         preventOnMount = false
       })
     } else {
-      w.addEventListner('hashchange', function (e) {
+      w.addEventListener('hashchange', function (e) {
         preventOnMount = true
         mount(d.location.hash.slice(1))
       })

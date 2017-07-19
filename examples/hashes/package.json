@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "buoyancy": "file:../.."
+  },
+  "scripts": {
+    "build": "browserify app.js -o bundle.js"
+  }
+}
