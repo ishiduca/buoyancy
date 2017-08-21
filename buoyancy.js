@@ -82,12 +82,13 @@ module.exports = function buoyancy (defaultData, _opt) {
   function update (p) {
     _update(p)
     _updateEl()
+    emitter.emit('update', el)
   }
 
   function _update (p) {
     if (!p) return
     data = xtend(data, p)
-    emitter.emit('update', xtend(data), p)
+    emitter.emit('update data', xtend(data), p)
   }
 
   function _updateEl () { return (el = yo.update(el, _rend())) }
