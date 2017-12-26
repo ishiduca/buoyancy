@@ -1,47 +1,37 @@
+var yo = require('buoyancy/html')
 var buoyancy = require('buoyancy')
-var html = require('buoyancy/html')
 
-var app = buoyancy({
-  count: 0
-}, {
-  location: false
-})
+var app = buoyancy({count: 0}, {location: false})
 
 app.reduce({
-  'app:count' (data, action, update) {
-    if (typeof action !== 'number') throw TypeError('action must be "number"')
+  count (data, action, update) {
     update({count: data.count + action})
   }
 })
 
-app.use((emitter, getData) => {
-  emitter.on('*', function logger (params) {
-    console.log('evnet - "%s"', this.event)
-    console.log(params)
+app.use(emitter => {
+  emitter.on('countup', e => {
+    e.stopPropagation()
+    emitter.emit('count', +1)
   })
-
-  emitter.on('error', err => {
-    console.error(err)
+  emitter.on('countdown', e => {
+    e.stopPropagation()
+    emitter.emit('count', -1)
   })
 })
 
-app.route('/', (data, params, route, actionsUp) => {
-  return html `
-    <main role="application">
-      <div>
-        <button onclick=${inc}>increment</button>
-        <button onclick=${dec}>decrement</button>
-        <button onclick=${err}>error</button>
-      </div>
-      <div>
-        result "${data.count}"
-      </div>
-    </main>
-  `
-
-  function inc () { actionsUp('app:count', +1) }
-  function dec () { actionsUp('app:count', -1) }
-  function err () { actionsUp('app:count', 'hoge') }
-})
+app.route('/', (data, params, u, actionsUp) => yo`
+  <div>
+    <button
+      type="button"
+      onclick=${e => actionsUp('countup', e)}
+    >plus</button>
+    <button
+      type="button"
+      onclick=${e => actionsUp('countdown', e)}
+    >minus</button>
+    <div id="result">${data.count}</div>
+  </div>
+`)
 
 document.body.appendChild(app('/'))
