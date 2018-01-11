@@ -95,6 +95,28 @@ app.reduce({
 })
 ```
 
+#### pause DOM update
+
+to temporarily stop updating the DOM when updating the data, set the 2nd argument of the `update` function to `true`.
+
+```js
+app.reduce({
+  increment (data, action, update) {
+    update({count: data.count + action}, true)
+  },
+  notify (data, action, update) {
+    update({notifier: action})
+  }
+})
+
+app.use((emitter, getData) => {
+  emitter.on('inc', (count) => {
+    emitter.emit('increment', count)
+    emitter.emit('notify', {message: `count - "${getData().count}"`})
+  })
+})
+```
+
 ### app.use(function(emitter, getData))
 
 when using `emitter` -primarily asynchronous processing and external API -, will pass the emitter as a function argument. 2nd argument `getData` function returns `copied data`.
@@ -128,8 +150,7 @@ register `render function`
 
 * __routePattern__ see [routington](https://www.npmjs.com/package/routington)
 * __renderFunction__ returns `HTML Element`. takes 4 arguments - `data`, `params`, `route`, `actionsUp`.
-
-** __actionsUp__ `function`. take 2 arguments - `type` and `value`. pass `value` to `emitter` or `Reducer`(via emitter). `type` is "event name" received `emitter.on`.
+* __actionsUp__ `function`. take 2 arguments - `type` and `value`. pass `value` to `emitter` or `Reducer`(via emitter). `type` is "event name" received `emitter.on`.
 
 ```js
 app.route('/', function mainViewRender (data, params, route, actionsUp) {

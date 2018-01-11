@@ -21,6 +21,7 @@ function buoyancy (defaultData, _opt) {
   var data = xtend(defaultData)
   var router = routington()
   var emitter = nsEmitter()
+  var pause = false
   var render
   var el
 
@@ -42,13 +43,17 @@ function buoyancy (defaultData, _opt) {
   return app
 
   function update () {
+    if (pause) return
     el = yo.update(el, render())
     emitter.emit(UPDATE)
   }
 
-  function updateData (part) {
+  function updateData (part, _pause) {
     if (!part) return
     data = xtend(data, part)
+
+    pause = !!_pause
+
     emitter.emit(UPDATE_DATA, xtend(data), part)
   }
 
