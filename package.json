@@ -1,6 +1,6 @@
 {
   "name": "buoyancy",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "create yo-yo component",
   "main": "buoyancy.js",
   "scripts": {
