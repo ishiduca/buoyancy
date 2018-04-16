@@ -67,7 +67,7 @@ Components -action-> emitter -action-> (API -action"-> emitter -action"->) Reduc
 * __action__ `type` and `value`. (ex "countup", +1)
 * __emitter__ event emitter (observer). it's a glue that connects Components and API and Reducer. pass `action` and `data` through emitter, or receive them.
 * __Components__ ref. [yo-yo](https://www.npmjs.com/package/yo-yo)
-* __Reducer__ Reducer takes 3 arguments - `data`, `actions value` and `update function`. it create `partial data to be updated` from `data` and `actions value`, and pass it to `update function`. and then `partial data` is merged with `original data` and reflected in Components
+* __Reducer__ Reducer takes 2 arguments - `data` and `actions value`. it create `partial data to be updated` from `data` and `actions value`. and then `partial data` is merged with `original data` and reflected in Components
 * __API__ primarily we use `Reducer` to __update data__, but `Reducer` is difficult to work with asynchronous processing. to do asynchronous processing, you need to write an API with an interface that can talk to emitter. as a process, API receives `action` from `Components` via `emitter`, and passes `new action` - generated through processed inside API - to `Reducer` via `emitter`.
 
 ## api
