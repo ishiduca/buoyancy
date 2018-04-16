@@ -48,12 +48,9 @@ function buoyancy (defaultData, _opt) {
     emitter.emit(UPDATE)
   }
 
-  function updateData (part, _pause) {
+  function updateData (part) {
     if (!part) return
     data = xtend(data, part)
-
-    pause = !!_pause
-
     emitter.emit(UPDATE_DATA, xtend(data), part)
   }
 
@@ -61,13 +58,30 @@ function buoyancy (defaultData, _opt) {
     Object.keys(reducer).forEach(function (method) {
       emitter.on(method, function (action) {
         try {
-          reducer[method](xtend(data), action, updateData)
+          updateData(reducer[method](xtend(data), action))
         } catch (err) {
           emitter.emit('error', err)
         }
       })
     })
   }
+//  function updateData (part, _pause) {
+//    if (!part) return
+//    data = xtend(data, part)
+//    pause = !!_pause
+//    emitter.emit(UPDATE_DATA, xtend(data), part)
+//  }
+//  function reduce (reducer) {
+//    Object.keys(reducer).forEach(function (method) {
+//      emitter.on(method, function (action) {
+//        try {
+//          reducer[method](xtend(data), action, updateData)
+//        } catch (err) {
+//          emitter.emit('error', err)
+//        }
+//      })
+//    })
+//  }
 
   function registerApi (api, opt) {
     api(emitter, function () { return xtend(data) }, opt)

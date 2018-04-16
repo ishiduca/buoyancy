@@ -1,11 +1,11 @@
 module.exports = {
-  'xhr:onResponse' (data, action, update) {
+  'xhr:onResponse' (data, action) {
     var sentence = action.text.split(/\n\n/).map(s => s.split(/\n/))
-    update({text: sentence})
+    return {text: sentence}
   },
 
-  'xhr:error' (data, action, update) {
+  'xhr:error' (data, action) {
     console.error(action)
-    update({text: [['no data :(']]})
+    return {text: [['no data :(']]}
   }
 }

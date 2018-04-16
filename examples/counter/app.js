@@ -4,8 +4,8 @@ var buoyancy = require('buoyancy')
 var app = buoyancy({count: 0}, {location: false})
 
 app.reduce({
-  count (data, action, update) {
-    update({count: data.count + action})
+  count (data, action) {
+    return {count: data.count + action}
   }
 })
 

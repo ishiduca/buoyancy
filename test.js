@@ -7,8 +7,7 @@ function setup () {
 
   app.reduce({
     count (data, action, update) {
-      var lock = data.count === -1
-      update({count: data.count + action}, lock)
+      return {count: data.count + action}
     }
   })
 
@@ -78,17 +77,9 @@ test('count', t => {
     $down.click()
   })
 
-  test('click down button - 3rd # paused DOM update', tt => {
+  test('click down button - 3rd # resume DOM update', tt => {
     setTimeout(() => {
-      tt.is($result.innerHTML, '-1', '$result.innerHTML eq "-1"')
-      tt.end()
-    }, 10)
-    $down.click()
-  })
-
-  test('click down button - 4th # resume DOM update', tt => {
-    setTimeout(() => {
-      tt.is($result.innerHTML, '-3', '$result.innerHTML eq "-3"')
+      tt.is($result.innerHTML, '-2', '$result.innerHTML eq "-2"')
       tt.end()
     }, 10)
     $down.click()

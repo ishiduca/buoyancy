@@ -15,8 +15,8 @@ var buoyancy = require('buoyancy')
 var app = buoyancy({count: 0}, {location: false})
 
 app.reduce({
-  count (data, action, update) {
-    update({count: data.count + action})
+  count (data, action) {
+    return {count: data.count + action}
   }
 })
 
@@ -85,36 +85,29 @@ registers `Reducer`.
 
 ```js
 app.reduce({
-  increment: function incrementReducer (data, action, update) {
+  increment: function incrementReducer (data, action) {
     if (typeof action !== 'number') {
       throw new TypeError('"increment" action must be "number"')
     }
     var c = data.count + action
-    update({count: c})
+    return {count: c}
   }
 })
 ```
 
-#### pause DOM update
-
-to temporarily stop updating the DOM when updating the data, set the 2nd argument of the `update` function to `true`.
+#### comppose reducers
 
 ```js
-app.reduce({
-  increment (data, action, update) {
-    update({count: data.count + action}, true)
-  },
-  notify (data, action, update) {
-    update({notifier: action})
+var compose = require('buoyancy/compose')
+app.reduce(compose({
+  incrementAndNotify: function (data, action) {
+    return {count: data.count + action}
   }
-})
-
-app.use((emitter, getData) => {
-  emitter.on('inc', (count) => {
-    emitter.emit('increment', count)
-    emitter.emit('notify', {message: `count - "${getData().count}"`})
-  })
-})
+}, {
+  incrementAndNotify: function (data, action) {
+    return {notify: `count up "${action}"`}
+  }
+}))
 ```
 
 ### app.use(function(emitter, getData))
@@ -123,8 +116,8 @@ when using `emitter` -primarily asynchronous processing and external API -, will
 
 ```js
 app.reduce({
-  'timer:emit' (data, action, update) {
-    update({count: action})
+  'timer:emit' (data, action) {
+    return {count: action}
   }
 })
 

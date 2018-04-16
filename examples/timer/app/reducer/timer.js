@@ -1,5 +1,5 @@
 module.exports = {
-  'app:resume' (data, action, update) {
+  'app:resume' (data, action) {
     var count = action.count == null ? data.count : action.count
     var countState = action.countState == null
       ? data.countState
@@ -7,29 +7,27 @@ module.exports = {
 
     countState.text = 'timer resume now :)'
 
-    update({
+    return {
       count: count,
       countState: countState
-    })
+    }
   },
-
-  'app:stop' (data, action, update) {
-    update({
+  'app:stop' (data, action) {
+    return {
       countState: {
         text: 'timer stop now :o',
         timerID: null
       }
-    })
+    }
   },
-
-  'app:ended' (data, action, update) {
-    update({
+  'app:ended' (data, action) {
+    return {
       count: 0,
       countState: {
         text: 'timer ended !!',
         timerID: null
       },
       toggleButtonDisabled: 'disabled'
-    })
+    }
   }
 }
